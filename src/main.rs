@@ -57,11 +57,13 @@ fn main() {
     assert_eq!(unitlist.len(), 27);
     assert!(squares.iter().all(|s| units[s].len() == 3));
     assert!(squares.iter().all(|s| peers[s].len() == 20));
-    assert_eq!(units.get("C2"), Some(vec![vec!["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2", "I2"],
-                                          vec!["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"],
-                                          vec!["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"]]));
-    assert_eq!(peers.get("C2"), Some(vec!["A2", "B2", "D2", "E2", "F2", "G2", "H2", "I2",
-                                          "C1", "C3", "C4", "C5", "C6", "C7", "C8", "C9",
-                                          "A1", "A3", "B1", "B3"]));
+    assert_eq!(units.get("C2"), Some(&vec![vec!["A2".to_string(), "B2".to_string(), "C2".to_string(), "D2".to_string(), "E2".to_string(), "F2".to_string(), "G2".to_string(), "H2".to_string(), "I2".to_string()],
+                                           vec!["C1".to_string(), "C2".to_string(), "C3".to_string(), "C4".to_string(), "C5".to_string(), "C6".to_string(), "C7".to_string(), "C8".to_string(), "C9".to_string()],
+                                           vec!["A1".to_string(), "A2".to_string(), "A3".to_string(), "B1".to_string(), "B2".to_string(), "B3".to_string(), "C1".to_string(), "C2".to_string(), "C3".to_string()]]));
+
+
+    assert_eq!(peers.get("C2"), Some(&vec!["A2".to_string(), "B2".to_string(), "D2".to_string(), "E2".to_string(), "F2".to_string(), "G2".to_string(), "H2".to_string(), "I2".to_string(),
+                                           "C1".to_string(), "C3".to_string(), "C4".to_string(), "C5".to_string(), "C6".to_string(), "C7".to_string(), "C8".to_string(), "C9".to_string(),
+                                           "A1".to_string(), "A3".to_string(), "B1".to_string(), "B3".to_string()]));
     println!("All tests pass.");
 }
