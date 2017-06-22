@@ -1,6 +1,6 @@
 [package]
 name = "rust-sudoku-solver"
 version = "0.1.0"
-authors = ["Mario Prince <mario.prince@outlook.com>"]
+authors = ["Rrogntudju"]
 
 [dependencies]
