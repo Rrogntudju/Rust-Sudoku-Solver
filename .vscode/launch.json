@@ -5,10 +5,10 @@
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "enter program name, for example \${workspaceRoot}/a.exe",
+            "program": "C:\\Users\\Spock\\Documents\\VSCode\\rust-sudoku-solver\\target\\debug\\rust-sudoku-solver.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "\\${workspaceRoot}",
+            "cwd": "C:\\Users\\Spock\\Documents\\VSCode\\rust-sudoku-solver\\target\\debug",
             "environment": [],
             "externalConsole": true
         }

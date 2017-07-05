@@ -1,5 +1,5 @@
 // A translation of Peter Norvig’s Sudoku solver from Python to Rust     http://www.norvig.com/sudoku.html
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap};
 
 fn cross (rows : &[char], cols : &[char]) -> Vec<String> {
     let mut v = Vec::new();
@@ -30,8 +30,8 @@ fn main() {
         unitlist.push(cross(&[*ch], &cols));
     }
     // boxes
-    for r in [&rows[0..2], &rows[3..5], &rows[6..8]].iter() {
-        for c in [&cols[0..2], &cols[3..5], &cols[6..8]].iter() {
+    for r in [&rows[0..3], &rows[3..6], &rows[6..9]].iter() {
+        for c in [&cols[0..3], &cols[3..6], &cols[6..9]].iter() {
             unitlist.push(cross(*r, *c));
         }
     }
@@ -46,10 +46,10 @@ fn main() {
     //  peers is a dictionary where each square s maps to the set of squares formed by the union of the squares in the units of s, but not s itself 
     let mut peers = HashMap::<String, Vec<String>>::new();
     for s in &squares {
-        let peers_set : HashSet<String> = units[s].concat().clone().into_iter().filter(|p| p != s).collect();
-        let mut peers_vec = Vec::<String>::new(); 
-        peers_vec.extend(peers_set.into_iter());
-        peers.insert(s.clone(), peers_vec);   
+        let mut peers_s : Vec<String> = units[s].concat().clone().into_iter().filter(|p| p != s).collect();
+        peers_s.sort();
+        peers_s.dedup();
+        peers.insert(s.clone(), peers_s);   
     }
 
     //  A set of unit tests.
@@ -61,9 +61,10 @@ fn main() {
                                            vec!["C1".to_string(), "C2".to_string(), "C3".to_string(), "C4".to_string(), "C5".to_string(), "C6".to_string(), "C7".to_string(), "C8".to_string(), "C9".to_string()],
                                            vec!["A1".to_string(), "A2".to_string(), "A3".to_string(), "B1".to_string(), "B2".to_string(), "B3".to_string(), "C1".to_string(), "C2".to_string(), "C3".to_string()]]));
 
-
-    assert_eq!(peers.get("C2"), Some(&vec!["A2".to_string(), "B2".to_string(), "D2".to_string(), "E2".to_string(), "F2".to_string(), "G2".to_string(), "H2".to_string(), "I2".to_string(),
-                                           "C1".to_string(), "C3".to_string(), "C4".to_string(), "C5".to_string(), "C6".to_string(), "C7".to_string(), "C8".to_string(), "C9".to_string(),
-                                           "A1".to_string(), "A3".to_string(), "B1".to_string(), "B3".to_string()]));
+    let mut peers_c2 = vec!["A2".to_string(), "B2".to_string(), "D2".to_string(), "E2".to_string(), "F2".to_string(), "G2".to_string(), "H2".to_string(), "I2".to_string(),
+                            "C1".to_string(), "C3".to_string(), "C4".to_string(), "C5".to_string(), "C6".to_string(), "C7".to_string(), "C8".to_string(), "C9".to_string(),
+                            "A1".to_string(), "A3".to_string(), "B1".to_string(), "B3".to_string()];
+    peers_c2.sort();
+    assert_eq!(peers.get("C2"), Some(&peers_c2));
     println!("All tests pass.");
 }
