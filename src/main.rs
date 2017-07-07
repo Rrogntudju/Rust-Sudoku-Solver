@@ -1,7 +1,17 @@
 // A translation of Peter Norvig’s Sudoku solver from Python to Rust     http://www.norvig.com/sudoku.html
 use std::collections::{HashMap};
 
-fn cross (rows : &[char], cols : &[char]) -> Vec<String> {
+#[derive(Debug)]
+struct Context {
+    cols: Vec<char>,
+    rows: Vec<char>,
+    squares: Vec<String>,
+    unitlist: Vec<Vec<String>>,
+    units: HashMap<String, Vec<Vec<String>>>,
+    peers: HashMap<String, Vec<String>>
+}
+
+fn cross (rows: &[char], cols: &[char]) -> Vec<String> {
     let mut v = Vec::new();
     for ch in rows {
         for d in cols {
@@ -14,12 +24,20 @@ fn cross (rows : &[char], cols : &[char]) -> Vec<String> {
     v
 }
 
+fn grid_values<'a> (grid: &String, ctx: &'a Context) -> HashMap<&'a String, char> {
+    let grid_chars: Vec<char> = grid.chars().filter(|ch| ctx.cols.contains(ch) || ['0', '.'].contains(ch)).collect();
+    assert_eq!(grid_chars.len(), 81);
+    let mut grid_values = HashMap::<&'a String, char>::new();
+    grid_values.extend(ctx.squares.iter().zip(grid_chars.into_iter()));
+    grid_values
+}
+
 fn main() {
-    let cols : Vec<char> = "123456789".chars().collect();
-    let rows : Vec<char> = "ABCDEFGHI".chars().collect();
+    let cols: Vec<char> = "123456789".chars().collect();
+    let rows: Vec<char> = "ABCDEFGHI".chars().collect();
     let squares = cross(&rows, &cols);
 
-    // A vector of units (a unit = a column, a row or a box of 9 squares)
+    // A vector of units (a unit = a column or a row or a box of 9 squares)
     let mut unitlist = Vec::<Vec<String>>::new();
     // columns
     for d in &cols {
@@ -67,4 +85,7 @@ fn main() {
     peers_c2.sort();
     assert_eq!(peers.get("C2"), Some(&peers_c2));
     println!("All tests pass.");
+
+    let context = Context {cols: cols, rows: rows, squares: squares, unitlist: unitlist, units: units, peers: peers};
+  
 }
