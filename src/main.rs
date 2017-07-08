@@ -24,12 +24,44 @@ fn cross (rows: &[char], cols: &[char]) -> Vec<String> {
     v
 }
 
-fn grid_values<'a> (grid: &String, ctx: &'a Context) -> HashMap<&'a String, char> {
+fn grid_values (grid: &String, ctx: &Context) -> HashMap<String, char> {
+    //  Convert grid into a dict of (square, char Vec) with '0' or '.' for empties.
     let grid_chars: Vec<char> = grid.chars().filter(|ch| ctx.cols.contains(ch) || ['0', '.'].contains(ch)).collect();
     assert_eq!(grid_chars.len(), 81);
-    let mut grid_values = HashMap::<&'a String, char>::new();
-    grid_values.extend(ctx.squares.iter().zip(grid_chars.into_iter()));
+    let mut grid_values = HashMap::<String, char>::new();
+    grid_values.extend(ctx.squares.clone().into_iter().zip(grid_chars.into_iter()));
     grid_values
+}
+
+fn parse_grid (grid: &String, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
+    //  Convert grid to Some dict of possible values, [square, digits], or return None if a contradiction is detected.
+    let mut values = HashMap::<String, Vec<char>>::new();
+    for s in &ctx.squares { 
+        values.insert(s.clone(), ctx.cols.clone());
+    }
+    for (s, d) in grid_values(&grid, ctx).iter() {
+        if ctx.cols.contains(d) {
+            if !assign(&mut values, s, d, ctx) {
+                 return None;
+            }
+        }
+    }
+    Some(values)
+}
+
+fn assign (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx: &Context) -> bool {
+   /* Assign a value d by eliminating all the other values (except d) from values[s] and propagate. Return false if a contradiction is detected.  */
+    let other_values: Vec<char> = values[s].clone().into_iter().filter(|d2| d2 != d).collect();
+    for d2 in &other_values {
+        if !eliminate(values, s, d2, ctx) {
+            return false;
+        }
+    }
+    true
+}
+
+fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx: &Context) -> bool {
+    true
 }
 
 fn main() {
@@ -88,4 +120,5 @@ fn main() {
 
     let context = Context {cols: cols, rows: rows, squares: squares, unitlist: unitlist, units: units, peers: peers};
   
+    parse_grid("", &context);
 }
