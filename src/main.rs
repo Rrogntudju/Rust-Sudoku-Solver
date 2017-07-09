@@ -24,11 +24,11 @@ fn cross (rows: &[char], cols: &[char]) -> Vec<String> {
     v
 }
 
-fn grid_values (grid: &String, ctx: &Context) -> HashMap<String, char> {
+fn grid_values (grid: &String, ctx: &Context) -> HashMap<String, Vec<char>> {
     //  Convert grid into a dict of (square, char Vec) with '0' or '.' for empties.
-    let grid_chars: Vec<char> = grid.chars().filter(|ch| ctx.cols.contains(ch) || ['0', '.'].contains(ch)).collect();
+    let grid_chars: Vec<Vec<char>> = grid.chars().filter(|ch| ctx.cols.contains(ch) || ['0', '.'].contains(ch)).map(|ch| vec![ch]).collect();
     assert_eq!(grid_chars.len(), 81);
-    let mut grid_values = HashMap::<String, char>::new();
+    let mut grid_values = HashMap::<String, Vec<char>>::new();
     grid_values.extend(ctx.squares.clone().into_iter().zip(grid_chars.into_iter()));
     grid_values
 }
@@ -40,8 +40,8 @@ fn parse_grid (grid: &String, ctx: &Context) -> Option<HashMap<String, Vec<char>
         values.insert(s.clone(), ctx.cols.clone());
     }
     for (s, d) in grid_values(&grid, ctx).iter() {
-        if ctx.cols.contains(d) {
-            if !assign(&mut values, s, d, ctx) {
+        if ctx.cols.contains(&d[0]) {
+            if !assign(&mut values, s, &d[0], ctx) {
                  return None;
             }
         }
@@ -50,7 +50,7 @@ fn parse_grid (grid: &String, ctx: &Context) -> Option<HashMap<String, Vec<char>
 }
 
 fn assign (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx: &Context) -> bool {
-   /* Assign a value d by eliminating all the other values (except d) from values[s] and propagate. Return false if a contradiction is detected.  */
+    // Assign a value d by eliminating all the other values (except d) from values[s] and propagate. Return false if a contradiction is detected.  
     let other_values: Vec<char> = values[s].clone().into_iter().filter(|d2| d2 != d).collect();
     for d2 in &other_values {
         if !eliminate(values, s, d2, ctx) {
@@ -64,11 +64,22 @@ fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx
     true
 }
 
+fn display (values: &HashMap<String, Vec<char>>, ctx: &Context) -> () {
+   ()
+}
+
+fn solve (grid: &String, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
+    if let Some(values) = parse_grid(grid, ctx) {
+        display(&values, ctx);
+        return Some(values);
+    }
+    None
+}
+
 fn main() {
     let cols: Vec<char> = "123456789".chars().collect();
     let rows: Vec<char> = "ABCDEFGHI".chars().collect();
     let squares = cross(&rows, &cols);
-
     // A vector of units (a unit = a column or a row or a box of 9 squares)
     let mut unitlist = Vec::<Vec<String>>::new();
     // columns
@@ -85,14 +96,12 @@ fn main() {
             unitlist.push(cross(*r, *c));
         }
     }
-    
     //  units is a dictionary where each square maps to the list of units that contain the square  
     let mut units = HashMap::<String, Vec<Vec<String>>>::new();
     for s in &squares {
         let unit_s : Vec<Vec<String>> = unitlist.clone().into_iter().filter(|u| u.contains(s)).collect();
         units.insert(s.clone(), unit_s);   
     }
-  
     //  peers is a dictionary where each square s maps to the set of squares formed by the union of the squares in the units of s, but not s itself 
     let mut peers = HashMap::<String, Vec<String>>::new();
     for s in &squares {
@@ -101,7 +110,6 @@ fn main() {
         peers_s.dedup();
         peers.insert(s.clone(), peers_s);   
     }
-
     //  A set of unit tests.
     assert_eq!(squares.len(), 81);
     assert_eq!(unitlist.len(), 27);
@@ -117,8 +125,6 @@ fn main() {
     peers_c2.sort();
     assert_eq!(peers.get("C2"), Some(&peers_c2));
     println!("All tests pass.");
-
     let context = Context {cols: cols, rows: rows, squares: squares, unitlist: unitlist, units: units, peers: peers};
   
-    parse_grid("", &context);
 }
