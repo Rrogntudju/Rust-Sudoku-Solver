@@ -61,6 +61,34 @@ fn assign (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx: &
 }
 
 fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx: &Context) -> bool {
+    if !values[s].contains(d) {
+        return true    // already eliminated
+    }
+    let i  = values[s].iter().position(|d2| d2 == d).unwrap();
+    values.get_mut(s).unwrap().remove(i);
+    // (rule 1) If a square s is reduced to one value d2, then eliminate d2 from the peers.
+    let d2 = values[s].clone();
+    if d2.len() == 0 {
+        return false; // Contradiction: removed last value
+    } else if d2.len() == 1 {
+        for s2 in &ctx.peers[s] {
+            if !eliminate(values, s2, &d2[0], ctx) {
+                return false;
+            }
+        }
+    }
+    // (rule 2) If a unit u is reduced to only one place for a value d, then put it there.
+    for u in &ctx.units[s] {
+        let dplaces: Vec<String> = u.iter().cloned().filter(|s2| values[s2].contains(d)).collect();
+        if dplaces.len() == 0 {
+            return false;   // Contradiction: no place for this value
+        } else if dplaces.len() == 1 {
+            // d can only be in one place in unit; assign it there
+            if !assign(values, &dplaces[0], d, ctx) {
+                return false;
+            }
+        }
+    }
     true
 }
 
