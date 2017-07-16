@@ -52,12 +52,7 @@ fn parse_grid (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> 
 fn assign (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx: &Context) -> bool {
     // Assign a value d by eliminating all the other values (except d) from values[s] and propagate. Return false if a contradiction is detected.  
     let other_values: Vec<char> = values[s].iter().cloned().filter(|d2| d2 != d).collect();
-    for d2 in &other_values {
-        if !eliminate(values, s, d2, ctx) {
-            return false;
-        }
-    }
-    true
+    other_values.iter().all(|d2| eliminate(values, s, d2, ctx))
 }
 
 fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx: &Context) -> bool {
@@ -71,10 +66,8 @@ fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx
     if d2.len() == 0 {
         return false; // Contradiction: removed last value
     } else if d2.len() == 1 {
-        for s2 in &ctx.peers[s] {
-            if !eliminate(values, s2, &d2[0], ctx) {
-                return false;
-            }
+        if !ctx.peers[s].iter().all(|s2| eliminate(values, s2, &d2[0], ctx)) {
+            return false;
         }
     }
     // (rule 2) If a unit u is reduced to only one place for a value d, then put it there.
@@ -93,7 +86,15 @@ fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx
 }
 
 fn display (values: &HashMap<String, Vec<char>>, ctx: &Context) -> () {
-   ()
+    let width = 1 + (values.iter().map(|v| v.1.len()).max().unwrap());
+    let line = [0..3].iter().map(|_| "-".repeat(3*width)).collect::<Vec<String>>().join("+");
+    for r in &ctx.rows {
+        println!("{}", ctx.cols.iter().map(|c| {let s = [*r, *c].iter().collect::<String>();
+                                                format!("{0: ^1$}", values[&s].iter().collect::<String>() + (if ['3', '6'].contains(c) {"|"} else {""}), width)
+                                            })                                             
+                                      .collect::<Vec<String>>().join("+"));
+        if ['C', 'F'].contains(r) {println!("{}", line)}
+    }
 }
 
 fn solve (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
@@ -144,13 +145,13 @@ fn main() {
     assert_eq!(unitlist.len(), 27);
     assert!(squares.iter().all(|s| units[s].len() == 3));
     assert!(squares.iter().all(|s| peers[s].len() == 20));
-    assert_eq!(units.get("C2"), Some(&vec![vec!["A2".to_string(), "B2".to_string(), "C2".to_string(), "D2".to_string(), "E2".to_string(), "F2".to_string(), "G2".to_string(), "H2".to_string(), "I2".to_string()],
-                                           vec!["C1".to_string(), "C2".to_string(), "C3".to_string(), "C4".to_string(), "C5".to_string(), "C6".to_string(), "C7".to_string(), "C8".to_string(), "C9".to_string()],
-                                           vec!["A1".to_string(), "A2".to_string(), "A3".to_string(), "B1".to_string(), "B2".to_string(), "B3".to_string(), "C1".to_string(), "C2".to_string(), "C3".to_string()]]));
+    assert_eq!(units.get("C2"), Some(&vec![vec!["A2".into(), "B2".into(), "C2".into(), "D2".into(), "E2".into(), "F2".into(), "G2".into(), "H2".into(), "I2".into()],
+                                           vec!["C1".into(), "C2".into(), "C3".into(), "C4".into(), "C5".into(), "C6".into(), "C7".into(), "C8".into(), "C9".into()],
+                                           vec!["A1".into(), "A2".into(), "A3".into(), "B1".into(), "B2".into(), "B3".into(), "C1".into(), "C2".into(), "C3".into()]]));
 
-    let mut peers_c2 = vec!["A2".to_string(), "B2".to_string(), "D2".to_string(), "E2".to_string(), "F2".to_string(), "G2".to_string(), "H2".to_string(), "I2".to_string(),
-                            "C1".to_string(), "C3".to_string(), "C4".to_string(), "C5".to_string(), "C6".to_string(), "C7".to_string(), "C8".to_string(), "C9".to_string(),
-                            "A1".to_string(), "A3".to_string(), "B1".to_string(), "B3".to_string()];
+    let mut peers_c2 = vec!["A2".into(), "B2".into(), "D2".into(), "E2".into(), "F2".into(), "G2".into(), "H2".into(), "I2".into(),
+                            "C1".into(), "C3".into(), "C4".into(), "C5".into(), "C6".into(), "C7".into(), "C8".into(), "C9".into(),
+                            "A1".into(), "A3".into(), "B1".into(), "B3".into()];
     peers_c2.sort();
     assert_eq!(peers.get("C2"), Some(&peers_c2));
     println!("All tests pass.");
