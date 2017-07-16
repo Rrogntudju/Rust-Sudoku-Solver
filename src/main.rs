@@ -87,14 +87,15 @@ fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx
 
 fn display (values: &HashMap<String, Vec<char>>, ctx: &Context) -> () {
     let width = 1 + (values.iter().map(|v| v.1.len()).max().unwrap());
-    let line = [0..3].iter().map(|_| "-".repeat(3*width)).collect::<Vec<String>>().join("+");
+    let line = [0, 1, 2].iter().map(|_| "-".repeat(3*width)).collect::<Vec<String>>().join("+");
     for r in &ctx.rows {
         println!("{}", ctx.cols.iter().map(|c| {let s = [*r, *c].iter().collect::<String>();
-                                                format!("{0: ^1$}", values[&s].iter().collect::<String>() + (if ['3', '6'].contains(c) {"|"} else {""}), width)
+                                                format!("{0: ^1$}", values[&s].iter().collect::<String>(), width) + (if ['3', '6'].contains(c) {"|"} else {""})
                                             })                                             
-                                      .collect::<Vec<String>>().join("+"));
+                                      .collect::<Vec<String>>().join(""));
         if ['C', 'F'].contains(r) {println!("{}", line)}
     }
+    println!("");
 }
 
 fn solve (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
