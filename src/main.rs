@@ -104,7 +104,7 @@ fn search(values: HashMap<String, Vec<char>>, ctx: &Context) -> Option<HashMap<S
         return Some(values);  // Solved!
     }
     // Chose the unfilled square s with the fewest possibilities
-    let (_, s) = values.iter().map(|(s, v)| (v.len(), s) ).min().unwrap();
+    let (_, s) = values.iter().filter(|&(_, v)| v.len() > 1).map(|(s, v)| (v.len(), s)).min().unwrap();
     for d in values[s].iter() {
         let mut cloned_values = values.clone();
         if !assign(&mut cloned_values, s, d, ctx) {
@@ -179,5 +179,5 @@ fn main() {
     println!("All tests pass.");
     let context = Context {cols: cols, rows: rows, squares: squares, unitlist: unitlist, units: units, peers: peers};
     solve("003020600900305001001806400008102900700000008006708200002609500800203009005010300", &context);
-
+    solve("4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......", &context);
 }
