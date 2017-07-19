@@ -103,24 +103,23 @@ fn search(values: HashMap<String, Vec<char>>, ctx: &Context) -> Option<HashMap<S
     if values.iter().all(|(_, v)| v.len() == 1) {
         return Some(values);  // Solved!
     }
-    // Chose the unfilled square s with the fewest possibilities
+    // Choose the unfilled square s with the fewest possibilities
     let (_, s) = values.iter().filter(|&(_, v)| v.len() > 1).map(|(s, v)| (v.len(), s)).min().unwrap();
     for d in values[s].iter() {
         let mut cloned_values = values.clone();
-        if !assign(&mut cloned_values, s, d, ctx) {
-            return None;
+        if assign(&mut cloned_values, s, d, ctx) {
+            if let Some(svalues) = search(cloned_values, ctx) {
+                return Some(svalues);
+            }  
         }
-        if let Some(svalues) = search(cloned_values, ctx) {
-           return Some(svalues);
-        }  
     }
     None
 }
 
 fn solve (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
+    display(&grid_values(grid, ctx), ctx);
     if let Some(values) = parse_grid(grid, ctx) {
         if let Some(values) = search(values, ctx) {
-            display(&grid_values(grid, ctx), ctx);
             display(&values, ctx);
             return Some(values);
         }
@@ -180,4 +179,5 @@ fn main() {
     let context = Context {cols: cols, rows: rows, squares: squares, unitlist: unitlist, units: units, peers: peers};
     solve("003020600900305001001806400008102900700000008006708200002609500800203009005010300", &context);
     solve("4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......", &context);
+    solve(".....6....59.....82....8....45........3........6..3.54...325..6..................", &context);
 }
