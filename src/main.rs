@@ -98,11 +98,32 @@ fn display (values: &HashMap<String, Vec<char>>, ctx: &Context) -> () {
     println!("");
 }
 
+fn search(values: HashMap<String, Vec<char>>, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
+    // Using depth-first search and propagation, try all possible values
+    if values.iter().all(|(_, v)| v.len() == 1) {
+        return Some(values);  // Solved!
+    }
+    // Chose the unfilled square s with the fewest possibilities
+    let (_, s) = values.iter().map(|(s, v)| (v.len(), s) ).min().unwrap();
+    for d in values[s].iter() {
+        let mut cloned_values = values.clone();
+        if !assign(&mut cloned_values, s, d, ctx) {
+            return None;
+        }
+        if let Some(svalues) = search(cloned_values, ctx) {
+           return Some(svalues);
+        }  
+    }
+    None
+}
+
 fn solve (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
     if let Some(values) = parse_grid(grid, ctx) {
-        display(&grid_values(grid, ctx), ctx);
-        display(&values, ctx);
-        return Some(values);
+        if let Some(values) = search(values, ctx) {
+            display(&grid_values(grid, ctx), ctx);
+            display(&values, ctx);
+            return Some(values);
+        }
     }
     None
 }
@@ -111,7 +132,7 @@ fn main() {
     let cols: Vec<char> = "123456789".chars().collect();
     let rows: Vec<char> = "ABCDEFGHI".chars().collect();
     let squares = cross(&rows, &cols);
-    // A vector of units (a unit = a column or a row or a box of 9 squares)
+    // A vector of units (a unit is a column or a row or a box of 9 squares)
     let mut unitlist = Vec::<Vec<String>>::new();
     // columns
     for d in &cols {
