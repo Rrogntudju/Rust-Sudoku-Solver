@@ -1,4 +1,5 @@
 // A translation of Peter Norvig’s Sudoku solver from Python to Rust     http://www.norvig.com/sudoku.html
+extern crate time;
 use std::collections::{HashMap};
 
 #[derive(Debug)]
@@ -98,7 +99,7 @@ fn display (values: &HashMap<String, Vec<char>>, ctx: &Context) -> () {
     println!("");
 }
 
-fn search(values: HashMap<String, Vec<char>>, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
+fn search (values: HashMap<String, Vec<char>>, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
     // Using depth-first search and propagation, try all possible values
     if values.iter().all(|(_, v)| v.len() == 1) {
         return Some(values);  // Solved!
@@ -117,14 +118,40 @@ fn search(values: HashMap<String, Vec<char>>, ctx: &Context) -> Option<HashMap<S
 }
 
 fn solve (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
-    display(&grid_values(grid, ctx), ctx);
-    if let Some(values) = parse_grid(grid, ctx) {
-        if let Some(values) = search(values, ctx) {
-            display(&values, ctx);
-            return Some(values);
-        }
+    parse_grid(grid, ctx).map_or(None, |v| search(v, ctx))
+}
+
+// fn solved (values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
+//     true
+// }
+
+fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context) -> () {
+    use time::get_time;
+    use std::f64;
+    let time_solve = |grid: &String| {
+            let start = get_time();
+            let values = solve(grid, ctx);
+            let t = (get_time() - start).num_milliseconds() as f64 / 1000.0;
+            // let mut r = false;
+            if let Some(show_time) = showif {
+                if t > show_time {
+                    display(&grid_values(grid, ctx), ctx);
+                    if let Some(v) = values {
+                        display(&v, ctx);
+                        //r = solved(&v, ctx);
+                    }
+                    println!("{:.2} seconds", t);
+                }
+            }
+            (t, true)
+    };
+    let (times, results): (Vec<_>, Vec<_>) = grids.iter().map(time_solve).unzip();
+    let nb = grids.len() as f64;
+    if nb > 1.0 {
+            println!("Solved {0} of {1} {2} puzzles (avg {3:.3} secs ({4:.0} Hz), max {5:.3} secs).",  
+                    results.iter().fold(0, |acc, r| acc + *r as usize), nb, name, times.iter().sum::<f64>() / nb, 
+                    nb / times.iter().sum::<f64>(), times.iter().cloned().fold(f64::NAN, f64::max));
     }
-    None
 }
 
 fn main() {
@@ -177,7 +204,7 @@ fn main() {
     assert_eq!(peers.get("C2"), Some(&peers_c2));
     println!("All tests pass.");
     let context = Context {cols: cols, rows: rows, squares: squares, unitlist: unitlist, units: units, peers: peers};
-    solve("003020600900305001001806400008102900700000008006708200002609500800203009005010300", &context);
-    solve("4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......", &context);
-    solve(".....6....59.....82....8....45........3........6..3.54...325..6..................", &context);
+    solve_all(vec!["003020600900305001001806400008102900700000008006708200002609500800203009005010300".into(), 
+                   "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......".into()], "test", Some(1.0), &context);
+    
 }
