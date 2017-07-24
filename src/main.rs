@@ -25,6 +25,24 @@ fn cross (rows: &[char], cols: &[char]) -> Vec<String> {
     v
 }
 
+fn test (ctx: &Context) -> () {
+//  A set of unit tests.
+    assert_eq!(ctx.squares.len(), 81);
+    assert_eq!(ctx.unitlist.len(), 27);
+    assert!(ctx.squares.iter().all(|s| ctx.units[s].len() == 3));
+    assert!(ctx.squares.iter().all(|s| ctx.peers[s].len() == 20));
+    assert_eq!(ctx.units.get("C2"), Some(&vec![vec!["A2".into(), "B2".into(), "C2".into(), "D2".into(), "E2".into(), "F2".into(), "G2".into(), "H2".into(), "I2".into()],
+                                          vec!["C1".into(), "C2".into(), "C3".into(), "C4".into(), "C5".into(), "C6".into(), "C7".into(), "C8".into(), "C9".into()],
+                                          vec!["A1".into(), "A2".into(), "A3".into(), "B1".into(), "B2".into(), "B3".into(), "C1".into(), "C2".into(), "C3".into()]]));
+
+    let mut peers_c2 = vec!["A2".into(), "B2".into(), "D2".into(), "E2".into(), "F2".into(), "G2".into(), "H2".into(), "I2".into(),
+                            "C1".into(), "C3".into(), "C4".into(), "C5".into(), "C6".into(), "C7".into(), "C8".into(), "C9".into(),
+                            "A1".into(), "A3".into(), "B1".into(), "B3".into()];
+    peers_c2.sort();
+    assert_eq!(ctx.peers.get("C2"), Some(&peers_c2));
+    println!("All tests pass.\n");
+}
+
 fn grid_values (grid: &str, ctx: &Context) -> HashMap<String, Vec<char>> {
     //  Convert grid into a dict of (square, char Vec) with '0' or '.' for empties.
     let grid_chars: Vec<Vec<char>> = grid.chars().filter(|ch| ctx.cols.contains(ch) || ['0', '.'].contains(ch)).map(|ch| vec![ch]).collect();
@@ -192,22 +210,8 @@ fn main() {
         peers_s.dedup();
         peers.insert(s.clone(), peers_s);   
     }
-    //  A set of unit tests.
-    assert_eq!(squares.len(), 81);
-    assert_eq!(unitlist.len(), 27);
-    assert!(squares.iter().all(|s| units[s].len() == 3));
-    assert!(squares.iter().all(|s| peers[s].len() == 20));
-    assert_eq!(units.get("C2"), Some(&vec![vec!["A2".into(), "B2".into(), "C2".into(), "D2".into(), "E2".into(), "F2".into(), "G2".into(), "H2".into(), "I2".into()],
-                                           vec!["C1".into(), "C2".into(), "C3".into(), "C4".into(), "C5".into(), "C6".into(), "C7".into(), "C8".into(), "C9".into()],
-                                           vec!["A1".into(), "A2".into(), "A3".into(), "B1".into(), "B2".into(), "B3".into(), "C1".into(), "C2".into(), "C3".into()]]));
-
-    let mut peers_c2 = vec!["A2".into(), "B2".into(), "D2".into(), "E2".into(), "F2".into(), "G2".into(), "H2".into(), "I2".into(),
-                            "C1".into(), "C3".into(), "C4".into(), "C5".into(), "C6".into(), "C7".into(), "C8".into(), "C9".into(),
-                            "A1".into(), "A3".into(), "B1".into(), "B3".into()];
-    peers_c2.sort();
-    assert_eq!(peers.get("C2"), Some(&peers_c2));
-    println!("All tests pass.\n");
     let context = Context {cols: cols, rows: rows, squares: squares, unitlist: unitlist, units: units, peers: peers};
+    test(&context);
     solve_all(vec!["003020600900305001001806400008102900700000008006708200002609500800203009005010300".into(), 
                    "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......".into()], "test", Some(0.0), &context);
     
