@@ -88,7 +88,7 @@ fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx
 
 fn display (values: &HashMap<String, Vec<char>>, ctx: &Context) -> () {
     let width = 1 + (values.iter().map(|v| v.1.len()).max().unwrap());
-    let line = [0; 3].iter().map(|_| "-".repeat(3*width)).collect::<Vec<String>>().join("+");
+    let line = ["-"; 3].iter().map(|c| c.repeat(3*width)).collect::<Vec<String>>().join("+");
     for r in &ctx.rows {
         println!("{}", ctx.cols.iter()
                                .map(|c| {let s = [*r, *c].iter().collect::<String>();
@@ -118,12 +118,18 @@ fn search (values: HashMap<String, Vec<char>>, ctx: &Context) -> Option<HashMap<
 }
 
 fn solve (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
-    parse_grid(grid, ctx).map_or(None, |v| search(v, ctx))
+    parse_grid(grid, ctx).and_then(|v| search(v, ctx))
 }
 
-// fn solved (values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
-//     true
-// }
+fn solved (values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
+    // A puzzle is solved if each unit is a permutation of the digits 1 to 9.  
+    let unitsolved = |unit: &Vec<String>| {
+        let mut digits_values = unit.iter().map(|s| values[s].iter().collect::<String>()).collect::<Vec<String>>();
+        digits_values.sort();
+        digits_values == ctx.cols.iter().map(|d| d.to_string()).collect::<Vec<String>>()
+    };
+    ctx.unitlist.iter().all(|u| unitsolved(u))
+}  
 
 fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context) -> () {
     use time::get_time;
@@ -132,18 +138,16 @@ fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context)
             let start = get_time();
             let values = solve(grid, ctx);
             let t = (get_time() - start).num_milliseconds() as f64 / 1000.0;
-            // let mut r = false;
             if let Some(show_time) = showif {
                 if t > show_time {
                     display(&grid_values(grid, ctx), ctx);
-                    if let Some(v) = values {
+                    if let Some(v) = values.as_ref() {
                         display(&v, ctx);
-                        //r = solved(&v, ctx);
                     }
-                    println!("{:.2} seconds", t);
+                    println!("{:.3} seconds\n", t);
                 }
             }
-            (t, true)
+            (t, values.map_or(false, |v| solved(&v, ctx)))
     };
     let (times, results): (Vec<_>, Vec<_>) = grids.iter().map(time_solve).unzip();
     let nb = grids.len() as f64;
@@ -202,9 +206,9 @@ fn main() {
                             "A1".into(), "A3".into(), "B1".into(), "B3".into()];
     peers_c2.sort();
     assert_eq!(peers.get("C2"), Some(&peers_c2));
-    println!("All tests pass.");
+    println!("All tests pass.\n");
     let context = Context {cols: cols, rows: rows, squares: squares, unitlist: unitlist, units: units, peers: peers};
     solve_all(vec!["003020600900305001001806400008102900700000008006708200002609500800203009005010300".into(), 
-                   "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......".into()], "test", Some(1.0), &context);
+                   "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......".into()], "test", Some(0.0), &context);
     
 }
