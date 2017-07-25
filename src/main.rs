@@ -1,6 +1,8 @@
 // A translation of Peter Norvig’s Sudoku solver from Python to Rust     http://www.norvig.com/sudoku.html
 extern crate time;
 use std::collections::{HashMap};
+use std::fs::File;
+use std::io::prelude::*;
 
 #[derive(Debug)]
 struct Context {
@@ -176,6 +178,13 @@ fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context)
     }
 }
 
+fn from_file (filename: &str) -> Vec<String> {
+    let mut f = File::open(filename).expect(&format!("Unable to open {}", filename));
+    let mut lines = String::new();
+    f.read_to_string(&mut lines).expect(&format!("Error reading {}", filename));
+    lines.split('\n').map(|s| s.to_string()).collect::<Vec<String>>()
+}
+
 fn main() {
     let cols: Vec<char> = "123456789".chars().collect();
     let rows: Vec<char> = "ABCDEFGHI".chars().collect();
@@ -212,7 +221,7 @@ fn main() {
     }
     let context = Context {cols: cols, rows: rows, squares: squares, unitlist: unitlist, units: units, peers: peers};
     test(&context);
-    solve_all(vec!["003020600900305001001806400008102900700000008006708200002609500800203009005010300".into(), 
-                   "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......".into()], "test", Some(0.0), &context);
-    
+    solve_all(from_file("easy50.txt"), "easy", Some(0.5), &context);
+    solve_all(from_file("top95.txt"), "hard", Some(0.5), &context);
+    solve_all(from_file("hardest.txt"), "hardest", Some(0.5), &context);
 }
