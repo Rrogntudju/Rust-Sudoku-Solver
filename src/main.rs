@@ -142,7 +142,7 @@ fn solve (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
 }
 
 fn solved (values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
-    // A puzzle is solved if each unit is a permutation of the digits 1 to 9.  
+//  A puzzle is solved if each unit is a permutation of the digits 1 to 9.  
     let unitsolved = |unit: &Vec<String>| {
         let mut digits_values = unit.iter().map(|s| values[s].iter().collect::<String>()).collect::<Vec<String>>();
         digits_values.sort();
