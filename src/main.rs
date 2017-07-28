@@ -173,11 +173,11 @@ fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
             let mut ds_set = ds.clone();
             ds_set.dedup();
             if ds_set.len() >= 8 {
-                
+
             }
         }
     }
-    random_puzzle(17, rng, ctx)
+    random_puzzle(17, rng, ctx) // Give up and make a new puzzle
 }
 
 fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context) -> () {
