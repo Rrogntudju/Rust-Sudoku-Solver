@@ -171,9 +171,10 @@ fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
         let ds: Vec<Vec<char>> = values.iter().filter(|&(s, v)| v.len() == 1).map(|(s, v)| v.clone()).collect();
         if ds.len() >= n {
             let mut ds_set = ds.clone();
+            ds_set.sort();
             ds_set.dedup();
             if ds_set.len() >= 8 {
-
+                return values.iter().map(|(_, v)| if v.len() == 1 {v[0]} else {'.'}).collect::<String>();
             }
         }
     }
