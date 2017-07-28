@@ -1,8 +1,10 @@
 // A translation of Peter Norvig’s Sudoku solver from Python to Rust     http://www.norvig.com/sudoku.html
+#![feature(rand)]
 extern crate time;
+extern crate rand;
 use std::collections::{HashMap};
-use std::fs::File;
-use std::io::prelude::*;
+use rand::{Rng, ChaChaRng};
+
 
 #[derive(Debug)]
 struct Context {
@@ -28,7 +30,7 @@ fn cross (rows: &[char], cols: &[char]) -> Vec<String> {
 }
 
 fn test (ctx: &Context) -> () {
-//  A set of unit tests.
+    // A set of unit tests.
     assert_eq!(ctx.squares.len(), 81);
     assert_eq!(ctx.unitlist.len(), 27);
     assert!(ctx.squares.iter().all(|s| ctx.units[s].len() == 3));
@@ -80,7 +82,7 @@ fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx
     if !values[s].contains(d) {
         return true    // already eliminated
     }
-    let i  = values[s].iter().position(|d2| d2 == d).unwrap();
+    let i = values[s].iter().position(|d2| d2 == d).unwrap();
     values.get_mut(s).unwrap().remove(i);
     // (rule 1) If a square s is reduced to one value d2, then eliminate d2 from the peers.
     let d2 = values[s].clone();
@@ -142,7 +144,7 @@ fn solve (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
 }
 
 fn solved (values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
-//  A puzzle is solved if each unit is a permutation of the digits 1 to 9.  
+    //  A puzzle is solved if each unit is a permutation of the digits 1 to 9.  
     let unitsolved = |unit: &Vec<String>| {
         let mut digits_values = unit.iter().map(|s| values[s].iter().collect::<String>()).collect::<Vec<String>>();
         digits_values.sort();
@@ -150,6 +152,33 @@ fn solved (values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
     };
     ctx.unitlist.iter().all(|u| unitsolved(u))
 }  
+
+fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
+    /* Make a random puzzle with N or more assignments. Restart on contradictions.
+        Note the resulting puzzle is not guaranteed to be solvable, but empirically
+        about 99.8% of them are solvable. Some have multiple solutions. */
+    let mut values = HashMap::<String, Vec<char>>::new();
+    for s in &ctx.squares { 
+        values.insert(s.clone(), ctx.cols.clone());
+    }
+    let mut squares = ctx.squares.clone();
+    rng.shuffle(&mut squares);
+    for s in squares.iter() {
+        let d2 = values[s].clone();
+        if !assign(&mut values, s, rng.choose(&d2).unwrap(), ctx) {
+            break;
+        }
+        let ds: Vec<Vec<char>> = values.iter().filter(|&(s, v)| v.len() == 1).map(|(s, v)| v.clone()).collect();
+        if ds.len() >= n {
+            let mut ds_set = ds.clone();
+            ds_set.dedup();
+            if ds_set.len() >= 8 {
+                
+            }
+        }
+    }
+    random_puzzle(17, rng, ctx)
+}
 
 fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context) -> () {
     use time::get_time;
@@ -179,10 +208,12 @@ fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context)
 }
 
 fn from_file (filename: &str) -> Vec<String> {
+    use std::fs::File;
+    use std::io::prelude::*;
     let mut f = File::open(filename).expect(&format!("Unable to open {}", filename));
     let mut lines = String::new();
     f.read_to_string(&mut lines).expect(&format!("Error reading {}", filename));
-    lines.split('\n').map(|s| s.to_string()).collect::<Vec<String>>()
+    lines.split('\n').map(|s| s.to_string()).collect()
 }
 
 fn main() {
@@ -224,4 +255,6 @@ fn main() {
     solve_all(from_file("easy50.txt"), "easy", Some(0.5), &context);
     solve_all(from_file("top95.txt"), "hard", Some(0.5), &context);
     solve_all(from_file("hardest.txt"), "hardest", Some(0.5), &context);
+    let mut rng = rand::ChaChaRng::new_unseeded();
+    solve_all([0; 99].iter().map(|_| random_puzzle(17, &mut rng, &context)).collect(), "random", Some(0.5), &context);
 }
