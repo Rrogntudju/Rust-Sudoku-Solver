@@ -3,7 +3,7 @@
 extern crate time;
 extern crate rand;
 use std::collections::{HashMap};
-use rand::{Rng, ChaChaRng};
+use rand::{Rng, ChaChaRng, SeedableRng};
 
 
 #[derive(Debug)]
@@ -168,13 +168,13 @@ fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
         if !assign(&mut values, s, rng.choose(&d2).unwrap(), ctx) {
             break;
         }
-        let ds: Vec<Vec<char>> = values.iter().filter(|&(s, v)| v.len() == 1).map(|(s, v)| v.clone()).collect();
+        let ds: Vec<Vec<char>> = values.iter().filter(|&(_, v)| v.len() == 1).map(|(_, v)| v.clone()).collect();
         if ds.len() >= n {
             let mut ds_set = ds.clone();
             ds_set.sort();
             ds_set.dedup();
             if ds_set.len() >= 8 {
-                return values.iter().map(|(_, v)| if v.len() == 1 {v[0]} else {'.'}).collect::<String>();
+                return ctx.squares.iter().map(|s| if values[s].len() == 1 {values[s][0]} else {'.'}).collect::<String>();
             }
         }
     }
@@ -218,6 +218,7 @@ fn from_file (filename: &str) -> Vec<String> {
 }
 
 fn main() {
+    use time::get_time;
     let cols: Vec<char> = "123456789".chars().collect();
     let rows: Vec<char> = "ABCDEFGHI".chars().collect();
     let squares = cross(&rows, &cols);
@@ -256,6 +257,6 @@ fn main() {
     solve_all(from_file("easy50.txt"), "easy", Some(0.5), &context);
     solve_all(from_file("top95.txt"), "hard", Some(0.5), &context);
     solve_all(from_file("hardest.txt"), "hardest", Some(0.5), &context);
-    let mut rng = rand::ChaChaRng::new_unseeded();
+    let mut rng = ChaChaRng::from_seed(&[get_time().nsec as u32]);
     solve_all([0; 99].iter().map(|_| random_puzzle(17, &mut rng, &context)).collect(), "random", Some(0.5), &context);
 }
