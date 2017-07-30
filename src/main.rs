@@ -182,6 +182,9 @@ fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
 }
 
 fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context) -> () {
+    /*  Attempt to solve a sequence of grids. Report results.
+        When showif is a number of seconds, display puzzles that take longer.
+        When showif is None, don't display any puzzles. */
     use time::get_time;
     use std::f64;
     let time_solve = |grid: &String| {
