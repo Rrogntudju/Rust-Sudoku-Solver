@@ -1,5 +1,4 @@
 // A translation of Peter Norvig’s Sudoku solver from Python to Rust     http://www.norvig.com/sudoku.html
-#![feature(rand)]
 extern crate time;
 extern crate rand;
 use std::collections::{HashMap};
@@ -65,7 +64,7 @@ fn parse_grid (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> 
     for (s, gvalues) in grid_values(&grid, ctx).iter() {
         for d in gvalues {
             if ctx.cols.contains(d) && !assign(&mut values, s, d, ctx) {
-                    return None;
+                return None;
             }
         }
     }
@@ -154,7 +153,7 @@ fn solved (values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
 }  
 
 fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
-    /* Make a random puzzle with N or more assignments. Restart on contradictions.
+    /*  Make a random puzzle with N or more assignments. Restart on contradictions.
         Note the resulting puzzle is not guaranteed to be solvable, but empirically
         about 99.8% of them are solvable. Some have multiple solutions. */
     let mut values = HashMap::<String, Vec<char>>::new();
