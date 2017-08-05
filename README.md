@@ -2,21 +2,21 @@
 An implementation of Peter Norvig’s Sudoku solver in Rust 
 
 # Results (slowest to fastest) for various implementations of Peter Norvig’s Sudoku solver (running on same hardware)
-**[Python version](http://www.norvig.com/sudoku.html) running on Windows 10 :**  
+**[Python version](http://www.norvig.com/sudoku.html) on Windows 10 :**  
 ```
 Solved 50 of 50 easy puzzles (avg 0.01 secs (182 Hz), max 0.01 secs).
 Solved 95 of 95 hard puzzles (avg 0.02 secs (51 Hz), max 0.09 secs).
 Solved 11 of 11 hardest puzzles (avg 0.01 secs (131 Hz), max 0.01 secs).
 Solved 99 of 99 random puzzles (avg 0.01 secs (167 Hz), max 0.01 secs).
 ```
-**[F# version](https://github.com/Rrogntudju/FSharp-Sudoku-Solver) running on Windows 10 :**
+**[F# version](https://github.com/Rrogntudju/FSharp-Sudoku-Solver) on Windows 10 :**
 ```
 Solved 50 of 50 easy puzzles (avg 0.01 secs (187 Hz), max 0.02 secs). 
 Solved 95 of 95 hard puzzles (avg 0.02 secs (61 Hz), max 0.08 secs).
 Solved 11 of 11 hardest puzzles (avg 0.01 secs (155 Hz), max 0.01 secs).
 Solved 99 of 99 random puzzles (avg 0.01 secs (184 Hz), max 0.01 secs).
 ```
-**[Python version](http://www.norvig.com/sudoku.html) running on Ubuntu Neon (Hyper-V) :**
+**[Python version](http://www.norvig.com/sudoku.html) on Ubuntu Neon (Hyper-V) :**
 ```
 Solved 50 of 50 easy puzzles (avg 0.00 secs (217 Hz), max 0.01 secs).
 Solved 95 of 95 hard puzzles (avg 0.02 secs (64 Hz), max 0.08 secs).
