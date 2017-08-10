@@ -147,7 +147,7 @@ fn solved (values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
     let unitsolved = |unit: &Vec<String>| {
         let mut digits_values = unit.iter().map(|s| values[s].iter().collect::<String>()).collect::<Vec<String>>();
         digits_values.sort();
-        digits_values == ctx.cols.iter().map(|d| d.to_string()).collect::<Vec<String>>()
+        digits_values == ctx.cols.iter().map(char::to_string).collect::<Vec<String>>()
     };
     ctx.unitlist.iter().all(|u| unitsolved(u))
 }  
@@ -204,7 +204,7 @@ fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context)
     let (times, results): (Vec<_>, Vec<_>) = grids.iter().map(time_solve).unzip();
     let nb = grids.len() as f64;
     if nb > 1.0 {
-            println!("Solved {0} of {1} {2} puzzles (avg {3:.3} secs ({4:.0} Hz), max {5:.3} secs).",  
+            println!("Solved {0} of {1} {2} puzzles (avg {3:.4} secs ({4:.0} Hz), max {5:.4} secs).",  
                     results.iter().fold(0, |acc, r| acc + *r as usize), nb, name, times.iter().sum::<f64>() / nb, 
                     nb / times.iter().sum::<f64>(), times.iter().cloned().fold(f64::NAN, f64::max));
     }
@@ -216,7 +216,7 @@ fn from_file (filename: &str) -> Vec<String> {
     let mut f = File::open(filename).expect(&format!("Unable to open {}", filename));
     let mut lines = String::new();
     f.read_to_string(&mut lines).expect(&format!("Error reading {}", filename));
-    lines.split('\n').map(|s| s.to_string()).collect()
+    lines.split('\n').map(str::to_string).collect()
 }
 
 fn main() {
