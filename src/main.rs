@@ -196,7 +196,7 @@ fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context)
                     if let Some(v) = values.as_ref() {
                         display(&v, ctx);
                     }
-                    println!("{:.3} seconds\n", t);
+                    println!("{:.4} seconds\n", t);
                 }
             }
             (t, values.map_or(false, |v| solved(&v, ctx)))
@@ -204,9 +204,9 @@ fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context)
     let (times, results): (Vec<_>, Vec<_>) = grids.iter().map(time_solve).unzip();
     let nb = grids.len() as f64;
     if nb > 1.0 {
-            println!("Solved {0} of {1} {2} puzzles (avg {3:.4} secs ({4:.0} Hz), max {5:.4} secs).",  
-                    results.iter().fold(0, |acc, r| acc + *r as usize), nb, name, times.iter().sum::<f64>() / nb, 
-                    nb / times.iter().sum::<f64>(), times.iter().cloned().fold(f64::NAN, f64::max));
+        println!("Solved {0} of {1} {2} puzzles (avg {3:.4} secs ({4:.0} Hz), max {5:.4} secs).",  
+                results.iter().fold(0, |acc, r| acc + *r as usize), nb, name, times.iter().sum::<f64>() / nb, 
+                nb / times.iter().sum::<f64>(), times.iter().cloned().fold(f64::NAN, f64::max));
     }
 }
 
