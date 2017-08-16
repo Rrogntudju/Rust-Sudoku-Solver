@@ -88,7 +88,7 @@ fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &str, d: &char, ctx: &
         return false; // Contradiction: removed last value
     } 
     if d2.len() == 1 && !ctx.peers[s].iter().all(|s2| eliminate(values, s2, &d2[0], ctx)) {
-            return false;
+        return false;
     }
     // (rule 2) If a unit u is reduced to only one place for a value d, then put it there.
     for u in &ctx.units[s] {
@@ -98,7 +98,7 @@ fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &str, d: &char, ctx: &
         }
         // if d can only be in one place in unit assign it there
         if dplaces.len() == 1 && !assign(values, &dplaces[0], d, ctx) {
-                return false;
+            return false;
         }
     }
     true
