@@ -4,7 +4,6 @@ extern crate rand;
 use std::collections::{HashMap};
 use rand::{Rng, ChaChaRng, SeedableRng};
 
-
 #[derive(Debug)]
 struct Context {
     cols: Vec<char>,
@@ -61,7 +60,7 @@ fn parse_grid (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> 
     for s in &ctx.squares { 
         values.insert(s.clone(), ctx.cols.clone());
     }
-    for (s, gvalues) in grid_values(&grid, ctx).iter() {
+    for (s, gvalues) in &grid_values(grid, ctx) {
         for d in gvalues {
             if ctx.cols.contains(d) && !assign(&mut values, s, d, ctx) {
                 return None;
@@ -71,13 +70,13 @@ fn parse_grid (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> 
     Some(values)
 }
 
-fn assign (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx: &Context) -> bool {
+fn assign (values: &mut HashMap<String, Vec<char>>, s: &str, d: &char, ctx: &Context) -> bool {
     // Assign a value d by eliminating all the other values (except d) from values[s] and propagate. Return false if a contradiction is detected.  
     let other_values: Vec<char> = values[s].iter().cloned().filter(|d2| d2 != d).collect();
     other_values.iter().all(|d2| eliminate(values, s, d2, ctx))
 }
 
-fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx: &Context) -> bool {
+fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &str, d: &char, ctx: &Context) -> bool {
     if !values[s].contains(d) {
         return true    // already eliminated
     }
@@ -85,23 +84,21 @@ fn eliminate (values: &mut HashMap<String, Vec<char>>, s: &String, d: &char, ctx
     values.get_mut(s).unwrap().remove(i);
     // (rule 1) If a square s is reduced to one value d2, then eliminate d2 from the peers.
     let d2 = values[s].clone();
-    if d2.len() == 0 {
+    if d2.is_empty() {
         return false; // Contradiction: removed last value
-    } else if d2.len() == 1 {
-        if !ctx.peers[s].iter().all(|s2| eliminate(values, s2, &d2[0], ctx)) {
+    } 
+    if d2.len() == 1 && !ctx.peers[s].iter().all(|s2| eliminate(values, s2, &d2[0], ctx)) {
             return false;
-        }
     }
     // (rule 2) If a unit u is reduced to only one place for a value d, then put it there.
     for u in &ctx.units[s] {
         let dplaces: Vec<String> = u.iter().cloned().filter(|s2| values[s2].contains(d)).collect();
-        if dplaces.len() == 0 {
+        if dplaces.is_empty() {
             return false;   // Contradiction: no place for this value
-        } else if dplaces.len() == 1 {
-            // d can only be in one place in unit; assign it there
-            if !assign(values, &dplaces[0], d, ctx) {
+        }
+        // if d can only be in one place in unit assign it there
+        if dplaces.len() == 1 && !assign(values, &dplaces[0], d, ctx) {
                 return false;
-            }
         }
     }
     true
@@ -127,7 +124,7 @@ fn search (values: HashMap<String, Vec<char>>, ctx: &Context) -> Option<HashMap<
     }
     // Choose the unfilled square s with the fewest possibilities
     let (_, s) = values.iter().filter(|&(_, v)| v.len() > 1).map(|(s, v)| (v.len(), s)).min().unwrap();
-    for d in values[s].iter() {
+    for d in &values[s] {
         let mut cloned_values = values.clone();
         if assign(&mut cloned_values, s, d, ctx) {
             if let Some(svalues) = search(cloned_values, ctx) {
@@ -162,7 +159,7 @@ fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
     }
     let mut squares = ctx.squares.clone();
     rng.shuffle(&mut squares);
-    for s in squares.iter() {
+    for s in &squares {
         let d2 = values[s].clone();
         if !assign(&mut values, s, rng.choose(&d2).unwrap(), ctx) {
             break;
@@ -180,7 +177,7 @@ fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
     random_puzzle(17, rng, ctx) // Give up and make a new puzzle
 }
 
-fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context) -> () {
+fn solve_all(grids: &[String], name: &str, showif: Option<f64>, ctx: &Context) -> () {
     /*  Attempt to solve a sequence of grids. Report results.
         When showif is a number of seconds, display puzzles that take longer.
         When showif is None, don't display any puzzles. */
@@ -194,7 +191,7 @@ fn solve_all(grids: Vec<String>, name: &str, showif: Option<f64>, ctx: &Context)
                 if t > show_time {
                     display(&grid_values(grid, ctx), ctx);
                     if let Some(v) = values.as_ref() {
-                        display(&v, ctx);
+                        display(v, ctx);
                     }
                     println!("{:.4} seconds\n", t);
                 }
@@ -235,8 +232,8 @@ fn main() {
         unitlist.push(cross(&[*ch], &cols));
     }
     // boxes
-    for r in [&rows[0..3], &rows[3..6], &rows[6..9]].iter() {
-        for c in [&cols[0..3], &cols[3..6], &cols[6..9]].iter() {
+    for r in &[&rows[0..3], &rows[3..6], &rows[6..9]] {
+        for c in &[&cols[0..3], &cols[3..6], &cols[6..9]] {
             unitlist.push(cross(*r, *c));
         }
     }
@@ -256,9 +253,9 @@ fn main() {
     }
     let context = Context {cols: cols, rows: rows, squares: squares, unitlist: unitlist, units: units, peers: peers};
     test(&context);
-    solve_all(from_file("easy50.txt"), "easy", Some(0.5), &context);
-    solve_all(from_file("top95.txt"), "hard", Some(0.5), &context);
-    solve_all(from_file("hardest.txt"), "hardest", Some(0.5), &context);
+    solve_all(&from_file("easy50.txt"), "easy", Some(0.5), &context);
+    solve_all(&from_file("top95.txt"), "hard", Some(0.5), &context);
+    solve_all(&from_file("hardest.txt"), "hardest", Some(0.5), &context);
     let mut rng = ChaChaRng::from_seed(&[get_time().nsec as u32]);
-    solve_all([0; 99].iter().map(|_| random_puzzle(17, &mut rng, &context)).collect(), "random", Some(0.5), &context);
+    solve_all(&[0; 99].iter().map(|_| random_puzzle(17, &mut rng, &context)).collect::<Vec<String>>(), "random", Some(0.5), &context);
 }
