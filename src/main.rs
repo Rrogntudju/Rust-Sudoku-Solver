@@ -164,12 +164,11 @@ fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
         if !assign(&mut values, s, rng.choose(&d2).unwrap(), ctx) {
             break;
         }
-        let ds: Vec<Vec<char>> = values.iter().filter(|&(_, v)| v.len() == 1).map(|(_, v)| v.clone()).collect();
+        let mut ds: Vec<Vec<char>> = values.iter().filter(|&(_, v)| v.len() == 1).map(|(_, v)| v.clone()).collect();
         if ds.len() >= n {
-            let mut ds_set = ds.clone();
-            ds_set.sort();
-            ds_set.dedup();
-            if ds_set.len() >= 8 {
+            ds.sort();
+            ds.dedup();
+            if ds.len() >= 8 {
                 return ctx.squares.iter().map(|s| if values[s].len() == 1 {values[s][0]} else {'.'}).collect::<String>();
             }
         }
@@ -203,7 +202,7 @@ fn solve_all(grids: &[String], name: &str, showif: Option<f64>, ctx: &Context) -
     if nb > 1.0 {
         println!("Solved {0} of {1} {2} puzzles (avg {3:.4} secs ({4:.0} Hz), max {5:.4} secs).",  
                 results.iter().fold(0, |acc, r| acc + *r as usize), nb, name, times.iter().sum::<f64>() / nb, 
-                nb / times.iter().sum::<f64>(), times.iter().cloned().fold(f64::NAN, f64::max));
+                nb / times.iter().sum::<f64>(), times.iter().fold(f64::NAN, |f1, &f2| {f1.max(f2)}));
     }
 }
 
