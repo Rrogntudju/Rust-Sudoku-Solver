@@ -56,7 +56,7 @@ fn grid_values (grid: &str, ctx: &Context) -> HashMap<String, Vec<char>> {
 
 fn parse_grid (grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
     //  Convert grid to Some dict of possible values, [square, digits], or return None if a contradiction is detected.
-    let mut values = HashMap::<String, Vec<char>>::new();
+    let mut values = HashMap::<String, Vec<char>>::with_capacity(81);
     for s in &ctx.squares { 
         values.insert(s.clone(), ctx.cols.clone());
     }
@@ -153,7 +153,7 @@ fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
     /*  Make a random puzzle with N or more assignments. Restart on contradictions.
         Note the resulting puzzle is not guaranteed to be solvable, but empirically
         about 99.8% of them are solvable. Some have multiple solutions. */
-    let mut values = HashMap::<String, Vec<char>>::new();
+    let mut values = HashMap::<String, Vec<char>>::with_capacity(81);
     for s in &ctx.squares { 
         values.insert(s.clone(), ctx.cols.clone());
     }
@@ -221,7 +221,7 @@ fn main() {
     let rows: Vec<char> = "ABCDEFGHI".chars().collect();
     let squares = cross(&rows, &cols);
     // A vector of units (a unit is a column or a row or a box of 9 squares)
-    let mut unitlist = Vec::<Vec<String>>::new();
+    let mut unitlist = Vec::<Vec<String>>::with_capacity(27);
     // columns
     for d in &cols {
         unitlist.push(cross(&rows, &[*d]));
@@ -237,13 +237,13 @@ fn main() {
         }
     }
     //  units is a dictionary where each square maps to the list of units that contain the square  
-    let mut units = HashMap::<String, Vec<Vec<String>>>::new();
+    let mut units = HashMap::<String, Vec<Vec<String>>>::with_capacity(81);
     for s in &squares {
         let unit_s : Vec<Vec<String>> = unitlist.iter().cloned().filter(|u| u.contains(s)).collect();
         units.insert(s.clone(), unit_s);   
     }
     //  peers is a dictionary where each square s maps to the set of squares formed by the union of the squares in the units of s, but not s itself 
-    let mut peers = HashMap::<String, Vec<String>>::new();
+    let mut peers = HashMap::<String, Vec<String>>::with_capacity(81);
     for s in &squares {
         let mut peers_s : Vec<String> = units[s].concat().iter().cloned().filter(|p| p != s).collect();
         peers_s.sort();
