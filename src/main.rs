@@ -146,7 +146,7 @@ fn solved (values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
         digits_values.sort();
         digits_values == ctx.cols.iter().map(char::to_string).collect::<Vec<String>>()
     };
-    ctx.unitlist.iter().all(|u| unitsolved(u))
+    ctx.unitlist.iter().all(unitsolved)
 }  
 
 fn random_puzzle (n: usize, rng: &mut ChaChaRng, ctx: &Context) -> String {
