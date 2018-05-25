@@ -255,6 +255,6 @@ fn main() {
     solve_all(&from_file("easy50.txt"), "easy", Some(0.5), &context);
     solve_all(&from_file("top95.txt"), "hard", Some(0.5), &context);
     solve_all(&from_file("hardest.txt"), "hardest", Some(0.5), &context);
-    let mut rng = ChaChaRng::from_seed(&[get_time().nsec as u32]);
+    let mut rng = ChaChaRng::from_seed([get_time().nsec as u8; 32]);
     solve_all(&(0..99).map(|_| random_puzzle(17, &mut rng, &context)).collect::<Vec<String>>(), "random", Some(0.5), &context);
 }
