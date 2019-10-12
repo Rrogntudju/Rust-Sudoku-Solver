@@ -286,11 +286,11 @@ fn solve_all(grids: &[String], name: &str, showif: Option<f64>, ctx: &Context) -
     When showif is a number of seconds, display puzzles that take longer.
     When showif is None, don't display any puzzles. */
     use std::f64;
-    use time::get_time;
+    use std::time::Instant;
     let time_solve = |grid: &String| {
-        let start = get_time();
+        let start = Instant::now();
         let values = solve(grid, ctx);
-        let t = (get_time() - start).num_milliseconds() as f64 / 1000.0;
+        let t = start.elapsed().as_secs_f64();
         if let Some(show_time) = showif {
             if t > show_time {
                 display(&grid_values(grid, ctx), ctx);
