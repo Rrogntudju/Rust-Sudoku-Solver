@@ -144,20 +144,12 @@ fn eliminate(values: &mut HashMap<String, Vec<char>>, s: &str, d: &char, ctx: &C
     if d2.is_empty() {
         return false; // Contradiction: removed last value
     }
-    if d2.len() == 1
-        && !ctx.peers[s]
-            .iter()
-            .all(|s2| eliminate(values, s2, &d2[0], ctx))
-    {
+    if d2.len() == 1 && !ctx.peers[s].iter().all(|s2| eliminate(values, s2, &d2[0], ctx)) {
         return false;
     }
     // (rule 2) If a unit u is reduced to only one place for a value d, then put it there.
     for u in &ctx.units[s] {
-        let dplaces: Vec<String> = u
-            .iter()
-            .cloned()
-            .filter(|s2| values[s2].contains(d))
-            .collect();
+        let dplaces: Vec<String> = u.iter().cloned().filter(|s2| values[s2].contains(d)).collect();
         if dplaces.is_empty() {
             return false; // Contradiction: no place for this value
         }
@@ -171,11 +163,7 @@ fn eliminate(values: &mut HashMap<String, Vec<char>>, s: &str, d: &char, ctx: &C
 
 fn display(values: &HashMap<String, Vec<char>>, ctx: &Context) -> () {
     let width = 1 + (values.iter().map(|v| v.1.len()).max().unwrap());
-    let line = ["-"; 3]
-        .iter()
-        .map(|c| c.repeat(3 * width))
-        .collect::<Vec<String>>()
-        .join("+");
+    let line = ["-"; 3].iter().map(|c| c.repeat(3 * width)).collect::<Vec<String>>().join("+");
     for r in &ctx.rows {
         println!(
             "{}",
@@ -183,8 +171,7 @@ fn display(values: &HashMap<String, Vec<char>>, ctx: &Context) -> () {
                 .iter()
                 .map(|c| {
                     let s = [*r, *c].iter().collect::<String>();
-                    format!("{0: ^1$}", values[&s].iter().collect::<String>(), width)
-                        + (if ['3', '6'].contains(c) { "|" } else { "" })
+                    format!("{0: ^1$}", values[&s].iter().collect::<String>(), width) + (if ['3', '6'].contains(c) { "|" } else { "" })
                 })
                 .collect::<String>()
         );
@@ -201,12 +188,7 @@ fn search(values: HashMap<String, Vec<char>>, ctx: &Context) -> Option<HashMap<S
         return Some(values); // Solved!
     }
     // Choose the unfilled square s with the fewest possibilities
-    let (_, s) = values
-        .iter()
-        .filter(|&(_, v)| v.len() > 1)
-        .map(|(s, v)| (v.len(), s))
-        .min()
-        .unwrap();
+    let (_, s) = values.iter().filter(|&(_, v)| v.len() > 1).map(|(s, v)| (v.len(), s)).min().unwrap();
     for d in &values[s] {
         let mut cloned_values = values.clone();
         if assign(&mut cloned_values, s, d, ctx) {
@@ -225,17 +207,9 @@ fn solve(grid: &str, ctx: &Context) -> Option<HashMap<String, Vec<char>>> {
 fn solved(values: &HashMap<String, Vec<char>>, ctx: &Context) -> bool {
     //  A puzzle is solved if each unit is a permutation of the digits 1 to 9.
     let unitsolved = |unit: &Vec<String>| {
-        let mut digits_values = unit
-            .iter()
-            .map(|s| values[s].iter().collect::<String>())
-            .collect::<Vec<String>>();
+        let mut digits_values = unit.iter().map(|s| values[s].iter().collect::<String>()).collect::<Vec<String>>();
         digits_values.sort();
-        digits_values
-            == ctx
-                .cols
-                .iter()
-                .map(char::to_string)
-                .collect::<Vec<String>>()
+        digits_values == ctx.cols.iter().map(char::to_string).collect::<Vec<String>>()
     };
     ctx.unitlist.iter().all(unitsolved)
 }
@@ -255,11 +229,7 @@ fn random_puzzle(n: usize, rng: &mut ThreadRng, ctx: &Context) -> String {
         if !assign(&mut values, s, d2.choose(rng).unwrap(), ctx) {
             break;
         }
-        let mut ds: Vec<Vec<char>> = values
-            .iter()
-            .filter(|&(_, v)| v.len() == 1)
-            .map(|(_, v)| v.clone())
-            .collect();
+        let mut ds: Vec<Vec<char>> = values.iter().filter(|&(_, v)| v.len() == 1).map(|(_, v)| v.clone()).collect();
         if ds.len() >= n {
             ds.sort();
             ds.dedup();
@@ -267,13 +237,7 @@ fn random_puzzle(n: usize, rng: &mut ThreadRng, ctx: &Context) -> String {
                 return ctx
                     .squares
                     .iter()
-                    .map(|s| {
-                        if values[s].len() == 1 {
-                            values[s][0]
-                        } else {
-                            '.'
-                        }
-                    })
+                    .map(|s| if values[s].len() == 1 { values[s][0] } else { '.' })
                     .collect::<String>();
             }
         }
@@ -322,8 +286,7 @@ fn from_file(filename: &str) -> Vec<String> {
     use std::io::prelude::*;
     let mut f = File::open(filename).expect(&format!("Unable to open {}", filename));
     let mut lines = String::new();
-    f.read_to_string(&mut lines)
-        .expect(&format!("Error reading {}", filename));
+    f.read_to_string(&mut lines).expect(&format!("Error reading {}", filename));
     lines.split('\n').map(str::to_string).collect()
 }
 
@@ -356,12 +319,7 @@ fn main() {
     //  peers is a dictionary where each square s maps to the set of squares formed by the union of the squares in the units of s, but not s itself
     let mut peers = HashMap::<String, Vec<String>>::with_capacity(81);
     for s in &squares {
-        let mut peers_s: Vec<String> = units[s]
-            .concat()
-            .iter()
-            .cloned()
-            .filter(|p| p != s)
-            .collect();
+        let mut peers_s: Vec<String> = units[s].concat().iter().cloned().filter(|p| p != s).collect();
         peers_s.sort();
         peers_s.dedup();
         peers.insert(s.clone(), peers_s);
@@ -380,9 +338,7 @@ fn main() {
     solve_all(&from_file("hardest.txt"), "hardest", Some(0.5), &context);
     let mut rng = rand::thread_rng();
     solve_all(
-        &(0..99)
-            .map(|_| random_puzzle(17, &mut rng, &context))
-            .collect::<Vec<String>>(),
+        &(0..99).map(|_| random_puzzle(17, &mut rng, &context)).collect::<Vec<String>>(),
         "random",
         Some(0.5),
         &context,
