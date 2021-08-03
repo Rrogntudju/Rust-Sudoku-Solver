@@ -184,7 +184,7 @@ impl Sudoku {
     }  
 
     pub fn display (grid: &str) -> PuzzleResult<Vec<String>> {
-        let grid_chars: Vec<char> = grid.chars().filter(|c| {"123456789".contains(*c) || ".0".contains(*c)}).collect();
+        let grid_chars: Vec<char> = grid.chars().filter(|c| {"123456789.0".contains(*c)}).collect();
         if grid_chars.len() == 81 {
             let width = 2;
             let sep = ["-"; 3].iter().map(|c| c.repeat(3*width)).collect::<Vec<String>>().join("+");
