@@ -13,8 +13,8 @@ fn from_file(filename: &str) -> Vec<String> {
 
 fn solve_all(grids: &[String], name: &str, showif: Option<f64>, solver: &Sudoku) -> () {
     /*  Attempt to solve a sequence of grids. Report results.
-        When showif is a number of seconds, display puzzles that take longer.
-        When showif is None, don't display any puzzles. */
+    When showif is a number of seconds, display puzzles that take longer.
+    When showif is None, don't display any puzzles. */
     use std::f64;
     use std::time::Instant;
     let time_solve = |grid: &String| {
@@ -24,16 +24,16 @@ fn solve_all(grids: &[String], name: &str, showif: Option<f64>, solver: &Sudoku)
         if let Some(show_time) = showif {
             if t > show_time {
                 if let Ok(v) = &values {
-                    Sudoku::display(grid).unwrap().iter().for_each(|s| println!("{}",  s));
+                    Sudoku::display(grid).unwrap().iter().for_each(|s| println!("{}", s));
                     println!();
-                    Sudoku::display(v).unwrap().iter().for_each(|s| println!("{}",  s));
+                    Sudoku::display(v).unwrap().iter().for_each(|s| println!("{}", s));
                 }
                 println!("{:.4} seconds\n", t);
             }
         }
         (t, values.is_ok())
     };
-    
+
     let (times, results): (Vec<_>, Vec<_>) = grids.iter().map(time_solve).unzip();
     let nb = grids.len() as f64;
     if nb > 1.0 {
