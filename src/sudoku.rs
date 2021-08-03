@@ -8,10 +8,7 @@ fn cross (rows: &[char], cols: &[char]) -> Vec<String> {
     let mut v = Vec::new();
     for ch in rows {
         for d in cols {
-            let mut sq = String::new();
-            sq.push(*ch);
-            sq.push(*d);
-            v.push(sq)
+            v.push(format!("{}{}", ch, d));
         }
     }
     v
