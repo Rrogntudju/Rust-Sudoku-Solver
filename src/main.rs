@@ -25,6 +25,7 @@ fn solve_all(grids: &[String], name: &str, showif: Option<f64>, solver: &Sudoku)
             if t > show_time {
                 if let Ok(v) = &values {
                     Sudoku::display(grid).unwrap().iter().for_each(|s| println!("{}",  s));
+                    println!();
                     Sudoku::display(v).unwrap().iter().for_each(|s| println!("{}",  s));
                 }
                 println!("{:.4} seconds\n", t);
@@ -54,7 +55,7 @@ fn main() {
     solver.test();
 
     solve_all(&from_file("easy50.txt"), "easy", Some(0.5), &solver);
-    solve_all(&from_file("top95.txt"), "hard", Some(0.5), &solver);
+    solve_all(&from_file("top95.txt"), "hard", Some(0.2), &solver);
     solve_all(&from_file("hardest.txt"), "hardest", Some(0.5), &solver);
     let mut rng = rand::thread_rng();
     solve_all(
