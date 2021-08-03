@@ -85,7 +85,7 @@ impl Sudoku {
 
     fn grid_values (&self, grid: &str) -> PuzzleResult<HashMap<String, Vec<char>>> {
         //  Convert grid into a dict of (square, char Vec) with '0' or '.' for empties.
-        let grid_chars: Vec<Vec<char>> = grid.chars().filter(|ch| self.cols.contains(ch) || ['0', '.'].contains(ch)).map(|ch| vec![ch]).collect();
+        let grid_chars: Vec<Vec<char>> = grid.chars().filter(|ch| self.cols.contains(ch) || "0.".contains(*ch)).map(|ch| vec![ch]).collect();
         if grid_chars.len() == 81 {
             let mut grid_values = HashMap::<String, Vec<char>>::new();
             grid_values.extend(self.squares.iter().cloned().zip(grid_chars.into_iter()));
