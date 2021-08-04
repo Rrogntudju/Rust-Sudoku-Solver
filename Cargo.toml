@@ -5,7 +5,8 @@ authors = ["Rrogntudju"]
 edition = "2018"
 
 [dependencies]
-rand = "0.7"
+rand = "0.8"
+ahash = "0.7"
 
 [profile.release]
 lto = "fat" 
