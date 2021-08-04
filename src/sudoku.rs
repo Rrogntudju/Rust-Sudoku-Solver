@@ -1,7 +1,7 @@
 // From Peter Norvig’s Sudoku solver     http://www.norvig.com/sudoku.html
+use ahash::AHashMap;
 use rand::rngs::ThreadRng;
 use rand::seq::SliceRandom;
-use ahash::AHashMap;
 use std::fmt;
 
 fn cross(rows: &[char], cols: &[char]) -> Vec<String> {
