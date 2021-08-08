@@ -62,9 +62,9 @@ impl Sudoku {
             unitlist.push(cross(&[*ch], &cols));
         }
         // boxes
-        for r in &[&rows[0..3], &rows[3..6], &rows[6..9]] {
-            for c in &[&cols[0..3], &cols[3..6], &cols[6..9]] {
-                unitlist.push(cross(*r, *c));
+        for r in [&rows[0..3], &rows[3..6], &rows[6..9]] {
+            for c in [&cols[0..3], &cols[3..6], &cols[6..9]] {
+                unitlist.push(cross(r, c));
             }
         }
         //  units is a dictionary where each square maps to the list of units that contain the square
