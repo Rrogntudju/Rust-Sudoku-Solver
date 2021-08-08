@@ -180,7 +180,7 @@ impl Sudoku {
     pub fn solve(&self, grid: &str) -> PuzzleResult<String> {
         let values = self.parse_grid(grid).and_then(|v| self.search(v))?;
         if self.solved(&values) {
-            Ok(self.squares.iter().map(|s| values[s][0]).collect::<String>())
+            Ok(self.squares.iter().map(|s| values[s][0]).collect())
         } else {
             Err(PuzzleError::Unsolved)
         }
@@ -189,7 +189,7 @@ impl Sudoku {
     fn solved(&self, values: &AHashMap<String, Vec<char>>) -> bool {
         //  A puzzle is solved if each unit is a permutation of the digits 1 to 9.
         let unitsolved = |unit: &Vec<String>| {
-            let mut digits_values = unit.iter().map(|s| values[s].iter().collect::<String>()).collect::<Vec<String>>();
+            let mut digits_values = unit.iter().map(|s| values[s].iter().collect()).collect::<Vec<String>>();
             digits_values.sort();
             digits_values == self.cols.iter().map(char::to_string).collect::<Vec<String>>()
         };
@@ -206,7 +206,7 @@ impl Sudoku {
                 for r in s.chunks(9) {
                     lines.push(
                         r.chunks(3)
-                            .map(|s| s.iter().map(|c| format!("{0: ^1$}", c, width)).collect::<String>())
+                            .map(|s| s.iter().map(|c| format!("{0: ^1$}", c, width)).collect())
                             .collect::<Vec<String>>()
                             .join("|"),
                     );
@@ -244,7 +244,7 @@ impl Sudoku {
                         .squares
                         .iter()
                         .map(|s| if values[s].len() == 1 { values[s][0] } else { '.' })
-                        .collect::<String>();
+                        .collect();
                 }
             }
         }
