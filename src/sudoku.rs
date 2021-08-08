@@ -252,7 +252,7 @@ impl Sudoku {
     }
 
     #[cfg(debug_assertions)]
-    pub fn test(&self) -> () {
+    pub fn test(&self) {
         // A set of unit tests.
         assert_eq!(self.squares.len(), 81);
         assert_eq!(self.unitlist.len(), 27);
