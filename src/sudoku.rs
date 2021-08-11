@@ -278,63 +278,14 @@ impl<'a> Sudoku<'a> {
         assert_eq!(
             self.units.get("C2"),
             Some(&vec![
-                vec![
-                    "A2".into(),
-                    "B2".into(),
-                    "C2".into(),
-                    "D2".into(),
-                    "E2".into(),
-                    "F2".into(),
-                    "G2".into(),
-                    "H2".into(),
-                    "I2".into()
-                ],
-                vec![
-                    "C1".into(),
-                    "C2".into(),
-                    "C3".into(),
-                    "C4".into(),
-                    "C5".into(),
-                    "C6".into(),
-                    "C7".into(),
-                    "C8".into(),
-                    "C9".into()
-                ],
-                vec![
-                    "A1".into(),
-                    "A2".into(),
-                    "A3".into(),
-                    "B1".into(),
-                    "B2".into(),
-                    "B3".into(),
-                    "C1".into(),
-                    "C2".into(),
-                    "C3".into()
-                ]
+                vec!["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2", "I2"],
+                vec!["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"],
+                vec!["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"]
             ])
         );
 
         let mut peers_c2 = vec![
-            "A2".into(),
-            "B2".into(),
-            "D2".into(),
-            "E2".into(),
-            "F2".into(),
-            "G2".into(),
-            "H2".into(),
-            "I2".into(),
-            "C1".into(),
-            "C3".into(),
-            "C4".into(),
-            "C5".into(),
-            "C6".into(),
-            "C7".into(),
-            "C8".into(),
-            "C9".into(),
-            "A1".into(),
-            "A3".into(),
-            "B1".into(),
-            "B3".into(),
+            "A2", "B2", "D2", "E2", "F2", "G2", "H2", "I2", "C1", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "A1", "A3", "B1", "B3",
         ];
         peers_c2.sort();
         assert_eq!(self.peers.get("C2"), Some(&peers_c2));
