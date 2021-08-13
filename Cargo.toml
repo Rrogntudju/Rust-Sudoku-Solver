@@ -5,8 +5,7 @@ authors = ["Rrogntudju"]
 edition = "2018"
 
 [dependencies]
-rand = "0.8"
-ahash = "0.7"
+sudoku = { git = "https://github.com/Rrogntudju/sudoku-rs.git", features = ["test"] }
 
 [profile.release]
 opt-level = 3

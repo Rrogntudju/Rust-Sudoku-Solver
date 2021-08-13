@@ -1,6 +1,5 @@
 // A translation of Peter Norvig’s Sudoku solver from Python to Rust     http://www.norvig.com/sudoku.html
-mod sudoku;
-use sudoku::{Sudoku, legos};
+use sudoku::solver::Sudoku;
 
 fn from_file(filename: &str) -> Vec<String> {
     use std::fs::File;
@@ -50,17 +49,14 @@ fn solve_all(grids: &[String], name: &str, showif: Option<f64>, solver: &Sudoku)
 }
 
 fn main() {
-    let (cols, rows, squares, unitlist) = legos();
-    let solver = Sudoku::new(cols, rows, &squares, &unitlist);
-    #[cfg(debug_assertions)]
+    let solver = Sudoku::new();
     solver.test();
 
     solve_all(&from_file("easy50.txt"), "easy", Some(0.5), &solver);
     solve_all(&from_file("top95.txt"), "hard", Some(0.2), &solver);
     solve_all(&from_file("hardest.txt"), "hardest", Some(0.5), &solver);
-    let mut rng = rand::thread_rng();
     solve_all(
-        &(0..99).map(|_| solver.random_puzzle(17, &mut rng)).collect::<Vec<String>>(),
+        &(0..99).map(|_| solver.random_puzzle(17)).collect::<Vec<String>>(),
         "random",
         Some(0.5),
         &solver,
