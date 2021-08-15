@@ -27,7 +27,7 @@ fn solve_all(grids: &[String], name: &str, showif: Option<f64>, solver: &Sudoku)
                     println!();
                     Sudoku::display(v).unwrap().iter().for_each(|s| println!("{}", s));
                 }
-                println!("{:.4} seconds\n", t);
+                println!("{:.5} seconds\n", t);
             }
         }
         (t, values.is_ok())
@@ -37,7 +37,7 @@ fn solve_all(grids: &[String], name: &str, showif: Option<f64>, solver: &Sudoku)
     let nb = grids.len() as f64;
     if nb > 1.0 {
         println!(
-            "Solved {0} of {1} {2} puzzles (avg {3:.4} secs ({4:.0} Hz), max {5:.4} secs).",
+            "Solved {0} of {1} {2} puzzles (avg {3:.5} secs ({4:.0} Hz), max {5:.5} secs).",
             results.iter().fold(0, |acc, r| acc + *r as usize),
             nb,
             name,
