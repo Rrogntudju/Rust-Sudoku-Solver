@@ -4,9 +4,9 @@ use sudoku::solver::Sudoku;
 fn from_file(filename: &str) -> Vec<String> {
     use std::fs::File;
     use std::io::prelude::*;
-    let mut f = File::open(filename).unwrap_or_else(|_| panic!("Unable to open {}", filename));
+    let mut f = File::open(filename).expect(&format!("Unable to open {}", filename));
     let mut lines = String::new();
-    f.read_to_string(&mut lines).unwrap_or_else(|_| panic!("Error reading {}", filename));
+    f.read_to_string(&mut lines).expect(&format!("Error reading {}", filename));
     lines.split('\n').map(str::to_string).collect()
 }
 
