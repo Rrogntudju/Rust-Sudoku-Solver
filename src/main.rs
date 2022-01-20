@@ -56,7 +56,7 @@ fn main() {
     solve_all(&from_file("top95.txt"), "hard", Some(0.02), &solver);
     solve_all(&from_file("hardest.txt"), "hardest", Some(0.02), &solver);
     solve_all(
-        &(0..99).map(|_| solver.random_puzzle(17)).collect::<Vec<String>>(),
+        &(0..99).map(|_| solver.make_puzzle(17)).collect::<Vec<String>>(),
         "random",
         Some(0.02),
         &solver,
